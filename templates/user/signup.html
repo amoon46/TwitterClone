@@ -1,0 +1,22 @@
+{% extends "user/base.html" %}
+
+{% block contents %}
+<div>
+  <form role="form" action="{% url 'user:signup' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h3>アカウント登録</h3>
+    <div>
+      <label for="id_email">メールアドレス:</label>
+      {{ form.email }}
+    </div>
+    <div>
+      <label for="id_password">パスワード:</label>
+      {{ form.password }}
+    </div>
+      <button class="btn btn-primary" type="submit">登録</button>
+    </div>
+  </form>
+</div>
+<div>
+</div>
+{% endblock %}
