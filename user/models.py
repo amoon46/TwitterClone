@@ -2,12 +2,8 @@ from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
-
-"""
-https://github.com/django/django/blob/main/django/contrib/auth/models.py
-"""
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -41,12 +37,31 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
 
-    email = models.EmailField('email address', unique=True, help_text=(
-        'メールアドレスを入力して欲しいっぴ'),)
+    class Meta:
+        # 人間が判読可能なフィールド(単数、複数)
+        verbose_name = 'user'
+        verbose_name_plural = 'users'
 
-    nickname = models.CharField(verbose_name='ニックネーム', max_length=10, blank=True, null=True, help_text=(
-        '君の名は。'),)
-    introduction = models.TextField(verbose_name='自己紹介', max_length=300, blank=True, null=True)
+    email = models.EmailField(
+        'email address',
+        unique=True,
+        help_text=('メールアドレスを入力して欲しいっぴ'),
+    )
+
+    nickname = models.CharField(
+        'ニックネーム',
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text=('君の名は。'),
+    )
+
+    introduction = models.TextField(
+        '自己紹介',
+        max_length=300,
+        blank=True,
+        null=True,
+    )
 
     is_staff = models.BooleanField(
         'staff status',
@@ -65,11 +80,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-
-    class Meta:
-        # 人間が判読可能なフィールド(単数、複数)
-        verbose_name = 'user'
-        verbose_name_plural = 'users'
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
