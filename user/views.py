@@ -1,11 +1,7 @@
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import CreateView
 from django.urls import reverse_lazy
 
 from .forms import SignUpForm
-
-
-class HomeView(TemplateView):
-    template_name = "user/home.html"
 
 
 class SignUpView(CreateView):
@@ -14,5 +10,5 @@ class SignUpView(CreateView):
     form_class = SignUpForm
 
     # プロジェクトのURLConf(url.py)が読み込まれる前に、URLを返す
-    success_url = reverse_lazy('user:home')
+    success_url = reverse_lazy('home')
     template_name = 'user/signup.html'
