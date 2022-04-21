@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.urls import reverse, resolve
+from django.urls import reverse
 
 from user.models import User
 
@@ -183,7 +183,6 @@ class TestFailSignUpView(TestCase):
         self.assertTrue(
             '確認用パスワードが一致しません。' in form.errors['password2']
         )
-        print(form.errors)
 
 
 class TestHomeView(TestCase):
