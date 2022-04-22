@@ -6,7 +6,7 @@ from user.models import User
 
 class TestSignUpView(TestCase):
     def setUp(self):
-        self.url_home = reverse('home')
+        self.url_home = reverse('twitter:home')
         self.url_signup = reverse('user:signup')
 
     def test_success_get(self):
@@ -34,12 +34,6 @@ class TestSignUpView(TestCase):
 
         user_object = User.objects.get(pk=1)
         self.assertEqual(user_object.email, self.data['email'])
-
-
-class TestFailSignUpView(TestCase):
-    def setUp(self):
-        self.url_home = reverse('home')
-        self.url_signup = reverse('user:signup')
 
     def test_failure_post_with_empty_form(self):
         self.data_blank = {
@@ -123,9 +117,6 @@ class TestFailSignUpView(TestCase):
 
         form = self.response_too_short_password.context.get('form')
         self.assertTrue(form.errors['password2'])
-        self.assertTrue(
-            'このパスワードは短すぎます。最低 8 文字以上必要です。' in form.errors['password2']
-        )
 
     def test_failure_post_with_password_similar_to_username(self):
         self.data_similar_to = {
@@ -141,9 +132,6 @@ class TestFailSignUpView(TestCase):
 
         form = self.response_similar_to.context.get('form')
         self.assertTrue(form.errors['password2'])
-        self.assertTrue(
-            'このパスワードは email address と似すぎています。' in form.errors['password2']
-        )
 
     def test_failure_post_with_only_numbers_password(self):
         self.data_only_numbers_password = {
@@ -160,9 +148,6 @@ class TestFailSignUpView(TestCase):
 
         form = self.response_only_numbers_password.context.get('form')
         self.assertTrue(form.errors['password2'])
-        self.assertTrue(
-            'このパスワードは数字しか使われていません。' in form.errors['password2']
-        )
 
     def test_failure_post_with_mismatch_password(self):
         self.data_not_equal_password = {
@@ -180,16 +165,13 @@ class TestFailSignUpView(TestCase):
 
         form = self.response_not_equal_password.context.get('form')
         self.assertTrue(form.errors['password2'])
-        self.assertTrue(
-            '確認用パスワードが一致しません。' in form.errors['password2']
-        )
 
 
 class TestHomeView(TestCase):
     def setUp(self):
-        self.url_home = reverse('home')
+        self.url_home = reverse('twitter:home')
 
     def test_success_get(self):
         self.response = self.client.get(self.url_home)
         self.assertEquals(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'home.html')
+        self.assertTemplateUsed(self.response, 'twitter/home.html')

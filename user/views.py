@@ -10,5 +10,5 @@ class SignUpView(CreateView):
     form_class = SignUpForm
 
     # プロジェクトのURLConf(url.py)が読み込まれる前に、URLを返す
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('twitter:home')
     template_name = 'user/signup.html'
