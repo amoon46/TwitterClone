@@ -1,16 +1,16 @@
-{% extends "twitter/base.html" %}
+{% extends 'twitter/base.html' %}
 {% load static %}
 
 {% block title %}
-signup
+update
 {% endblock title %}
 
 {% block contents %}
 <div class="ui text container">
-  <br><br><div class="ui center aligned grid" ><h2>あのーなんだろう、嘘つくのやめてもらってもいいですか？</h2></div><br>
+  <br><div class="header"><h2>edit</h2></div><br>
   <div class="ui segment">
     <div class="d-flex align-items-center">
-      <form role="form" action="{% url 'user:signup' %}" method="post">
+      <form role="form" action="{% url 'user:update' %}" method="post">
         {% csrf_token %}
         {% for field in form %}
           <p>
@@ -24,11 +24,10 @@ signup
             {% endfor %}
           </p>
         {% endfor %}
-        <button class="btn btn-primary" type="submit">登録</button>
-        <a href="{% url 'user:login' %}">ログインへ</a>
+        <button class="btn btn-primary" type="submit">finish</button>
       </form>
+      <img class="ui medium centered image" src="{% static 'images/Trueman_show.png' %}">
     <div>
-  <div>
-      <img class="ui fluid image" src="{% static 'images/hiroyuki.png' %}">
+  </div>
 </div>
 {% endblock %}

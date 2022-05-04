@@ -1,0 +1,17 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+logout
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+  <p>
+    <h2>Exitしますか？</h2>
+    <img class="ui medium image" src="{% static 'images/exit.jpeg' %}"><br>
+    <a href="{% url 'user:logout' %}" class="btn btn-primary">ログアウト</a>
+    <a href="{% url 'twitter:home' %}" class="btn btn-outline-secondary">トップに戻る</a>
+  </p>
+</div>
+{% endblock %}

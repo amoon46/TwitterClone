@@ -42,6 +42,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
+    followees = models.ManyToManyField('self', blank=True, symmetrical=False)
+
     email = models.EmailField(
         'email address',
         unique=True,
@@ -53,11 +55,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=10,
         blank=True,
         null=True,
-        help_text=('君の名は。'),
     )
 
     introduction = models.TextField(
-        '自己紹介',
+        'introduce',
         max_length=300,
         blank=True,
         null=True,
