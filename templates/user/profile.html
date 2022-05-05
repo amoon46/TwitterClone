@@ -19,6 +19,6 @@ profile
           </tr>
         </table>
     </div><br>
-  <a class="ui button" href="{% url 'user:update' %}">edit</a>
+  <a class="ui button" href="{% url 'user:update' user.pk %}">edit</a>
 </div>
 {% endblock %}
