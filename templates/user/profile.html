@@ -14,10 +14,6 @@ profile
             <td>{% if user.nickname %}{{ user.nickname }}{% else %}未設定{% endif %}</td>
           </tr>
           <tr>
-            <td>メールアドレス</td>
-            <td>{{ user.email }}</td>
-          </tr>
-          <tr>
             <td>introduction</td>
             <td>{% if user.introduction %}{{ user.introduction }}{% else %}未設定{% endif %}</td>
           </tr>
@@ -26,5 +22,3 @@ profile
   <a class="ui button" href="{% url 'user:update' %}">edit</a>
 </div>
 {% endblock %}
-
-

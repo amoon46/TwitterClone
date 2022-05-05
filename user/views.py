@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 
 from .forms import SignUpForm, LoginForm
 
@@ -17,14 +17,9 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('twitter:home')
     template_name = 'user/signup.html'
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-
     def form_valid(self, form):  # 追記
         response = super().form_valid(form)
-        email = form.cleaned_data.get('email')
-        raw_password = form.cleaned_data.get('password1')
-        user = authenticate(email=email, password=raw_password)
+        user = self.object
         login(self.request, user)
         return response
 
@@ -33,20 +28,12 @@ class Login(LoginView):
     form_class = LoginForm
     template_name = 'user/login.html'
 
-    def form_valid(self, form):
-        print("ログインしました。")
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        print("ログインに失敗しました。")
-        return super().form_invalid(form)
-
 
 class LogoutConfirmView(LoginRequiredMixin, TemplateView):
     template_name = 'user/logout_confirm.html'
 
 
-class ProfileDisplay(TemplateView):
+class ProfileDisplay(LoginRequiredMixin, TemplateView):
     template_name = 'user/profile.html'
 
 

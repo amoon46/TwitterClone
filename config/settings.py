@@ -117,10 +117,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.User'
 
 # ログインページURLパス
-LOGIN_URL = '/login/'
+LOGIN_URL = 'user:login'
 # ログイン後のリダイレクト先URLパス
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'twitter:home'
 # ログアウトページ用のURLパス
-LOGOUT_URL = '/logout/'
+LOGOUT_URL = 'user:logout'
 # ログアウト時のリダイレクト先URLパス
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = 'user:login'

@@ -1,9 +1,8 @@
 from django.test import TestCase
-from django.test import Client
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+from django.contrib.auth import SESSION_KEY
 
-from user.models import User
+from .models import User
 
 
 class TestSignUpView(TestCase):
@@ -36,6 +35,7 @@ class TestSignUpView(TestCase):
 
         user_object = User.objects.get(pk=1)
         self.assertEqual(user_object.email, self.data['email'])
+        self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_form(self):
         self.data_blank = {
@@ -168,59 +168,97 @@ class TestSignUpView(TestCase):
         form = self.response_not_equal_password.context.get('form')
         self.assertTrue(form.errors['password2'])
 
-    """
-    class TestHomeView(TestCase):
-        def setUp(self):
-            self.url_home = reverse('twitter:home')
 
-        def test_success_get(self):
-            self.response = self.client.get(self.url_home)
-            self.assertEquals(self.response.status_code, 302)
-            self.assertTemplateUsed(self.response, 'twitter/home.html')
-    """
+class TestHomeView(TestCase):
+    def setUp(self):
+        self.url_home = reverse('twitter:home')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
+
+    def test_success_get(self):
+        self.response = self.client.get(self.url_home)
+        self.assertEquals(self.response.status_code, 200)
+        self.assertTemplateUsed(self.response, 'twitter/home.html')
 
 
 class TestLoginView(TestCase):
     def setUp(self):
         self.url_login = reverse('user:login')
         self.url_home = reverse('twitter:home')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_login)
         self.assertEquals(self.response_get.status_code, 200)
         self.assertTemplateUsed(self.response_get, 'user/login.html')
 
-    """
-        def test_success_post(self):
+    def test_success_post(self):
+        self.data = {
+            'username': 'test@gmail.com',
+            'password': 'Hogehoge777',
+        }
+        self.response_post = self.client.post(self.url_login, self.data)
 
-            self.data = {
-                'email': 'test@gmail.com',
-                'password1': 'Hogehoge777',
-                'password2': 'Hogehoge777',
-            }
-            self.response_post = self.client.post(self.url_login, self.data)
-            self.assertRedirects(
-                self.response_post,
-                self.url_home,
-                status_code=302,
-                target_status_code=200
-            )
-    """
+        self.assertRedirects(
+            self.response_post,
+            self.url_home,
+            status_code=302,
+            target_status_code=200
+        )
+        self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
-        pass
+        self.data = {
+            'username': '000@gmail.com',
+            'password': 'Hogehoge777',
+        }
+        self.response_with_not_exists_user = self.client.post(self.url_login, self.data)
+
+        self.assertEquals(self.response_with_not_exists_user.status_code, 200)
+
+        form = self.response_with_not_exists_user.context.get('form')
+        self.assertTrue(form.non_field_errors)
+
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
-        pass
+        self.data = {
+            'username': 'test@gmail.com',
+            'password': '',
+        }
+        self.response_with_empty_password = self.client.post(self.url_login, self.data)
+
+        self.assertEquals(self.response_with_empty_password.status_code, 200)
+
+        form = self.response_with_empty_password.context.get('form')
+        self.assertTrue(form.non_field_errors)
+
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
-    pass
+    def setUp(self):
+        self.url_logout = reverse('user:logout')
+        self.url_confirm = reverse('user:logout_confirm')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
+
+    def test_logout_confirm_success_get(self):
+        self.response_confirm = self.client.get(self.url_confirm)
+        self.assertEqual(self.response_confirm.status_code, 200)
+
+    def test_logout_success_get(self):
+        self.response_logout = self.client.get(self.url_logout)
+        self.assertEqual(self.response_logout.status_code, 302)
+
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestUserProflieView(TestCase):
     def setUp(self):
         self.url_profile = reverse('user:profile')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_profile)
@@ -228,10 +266,12 @@ class TestUserProflieView(TestCase):
         self.assertTemplateUsed(self.response_get, 'user/profile.html')
 
 
-"""
 class TestUserProfileEditView(TestCase):
     def setUp(self):
+        self.url_profile = reverse('user:profile')
         self.url_update = reverse('user:update')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_update)
@@ -239,20 +279,43 @@ class TestUserProfileEditView(TestCase):
         self.assertTemplateUsed(self.response_get, 'user/profile_update.html')
 
     def test_success_post(self):
-        pass
+        self.data = {
+            'nickname': 'yesman',
+            'introduction': 'jimcarrey',
+        }
+        self.response_post = self.client.post(self.url_update, self.data)
+
+        self.assertRedirects(
+            self.response_post,
+            self.url_profile,
+            status_code=302,
+            target_status_code=200
+        )
+        user_object = User.objects.get(pk=1)
+        self.assertEqual(user_object.nickname, self.data['nickname'])
+        self.assertEqual(user_object.introduction, self.data['introduction'])
 
     def test_failure_post_with_not_exists_user(self):
-        pass
+        self.incorrect_user = User.objects.create_user(
+            email='notexists@gmail.com', password='Hogehoge777'
+        )
+        self.data = {
+            'nickname': 'yesman',
+            'introduction': 'jimcarrey',
+        }
+
+        self.response_with_incorrect_user = self.client.post(self.url_update, self.data)
+        self.assertRedirects(
+            self.response_with_incorrect_user,
+            self.url_profile,
+            status_code=302,
+            target_status_code=200
+        )
+        print(User.objects.get(pk=1))
+        print(User.objects.get(pk=2))
+        user_object = User.objects.get(pk=1)
+
+        print(user_object.nickname)
 
     def test_failure_post_with_incorrect_user(self):
         pass
-
-"""
-
-"""
-class SimpleTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(email='temporary@gmail.com', password='temporary')
-        self.client = Client()
-        self.client.login(email='temporary@gmail.com', password='temporary')
-"""
