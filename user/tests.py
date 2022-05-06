@@ -240,8 +240,8 @@ class TestLogoutView(TestCase):
     def setUp(self):
         self.url_logout = reverse('user:logout')
         self.url_confirm = reverse('user:logout_confirm')
-        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
-        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
+        User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_logout_confirm_success_get(self):
         self.response_confirm = self.client.get(self.url_confirm)
@@ -257,8 +257,8 @@ class TestLogoutView(TestCase):
 class TestUserProflieView(TestCase):
     def setUp(self):
         self.url_profile = reverse('user:profile')
-        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
-        self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
+        User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_profile)
@@ -271,14 +271,9 @@ class TestUserProfileEditView(TestCase):
         self.user = User.objects.create_user(
             email='test@gmail.com', password='Hogehoge777'
         )
-        self.incorrect_user = User.objects.create_user(
-            email='notexists@gmail.com', password='Hogehoge777'
-        )
         self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.url_profile = reverse('user:profile')
-        self.url_update = reverse('user:update', args=[1])
-        self.url_update_other = reverse('user:update', args=[2])
-        self.url_update_not_exists = reverse('user:update', args=[3])
+        self.url_update = reverse('user:profile_update', args=[1])
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_update)
@@ -301,24 +296,3 @@ class TestUserProfileEditView(TestCase):
         user_object = User.objects.get(pk=1)
         self.assertEqual(user_object.nickname, self.data['nickname'])
         self.assertEqual(user_object.introduction, self.data['introduction'])
-
-    def test_failure_post_with_not_exists_user(self):
-        self.data = {
-            'nickname': 'yesman',
-            'introduction': 'jimcarrey',
-        }
-
-        self.response_with_incorrect_user = self.client.post(self.url_update_not_exists, self.data)
-        print(self.response_with_incorrect_user.context.get('form').errors)
-        self.assertEqual(self.response_with_incorrect_user.status_code, 403)
-
-"""
-    def test_failure_post_with_incorrect_user(self):
-        self.data = {
-            'nickname': 'yesman',
-            'introduction': 'jimcarrey',
-        }
-
-        self.response_with_incorrect_user = self.client.post(self.url_update_other, self.data)
-        self.assertEqual(self.response_with_incorrect_user.status_code, 403)
-"""

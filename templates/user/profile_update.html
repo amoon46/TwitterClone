@@ -10,7 +10,7 @@ update
   <br><div class="header"><h2>edit</h2></div><br>
   <div class="ui segment">
     <div class="d-flex align-items-center">
-      <form role="form" action="{% url 'user:update' user.pk %}" method="post">
+      <form role="form" action="{% url 'user:profile_update' user.pk %}" method="post">
         {% csrf_token %}
         {% for field in form %}
           <p>
