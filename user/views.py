@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView, CreateView, UpdateView
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth import login
 
@@ -37,15 +37,7 @@ class ProfileDisplay(LoginRequiredMixin, TemplateView):
     template_name = 'user/profile.html'
 
 
-class OnlyYouMixin(UserPassesTestMixin):
-    raise_exception = True     # set True if raise 403_Forbidden
-
-    def test_func(self):
-        user = self.request.user
-        return user.pk == self.kwargs['pk'] or user.is_superuser
-
-
-class ProfileUpdateView(LoginRequiredMixin, OnlyYouMixin, UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     template_name = 'user/profile_update.html'
     fields = ('nickname', 'introduction')

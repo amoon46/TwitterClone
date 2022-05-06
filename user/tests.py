@@ -273,7 +273,7 @@ class TestUserProfileEditView(TestCase):
         )
         self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.url_profile = reverse('user:profile')
-        self.url_update = reverse('user:profile_update', args=[1])
+        self.url_update = reverse('user:profile_update')
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_update)
