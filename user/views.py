@@ -33,7 +33,7 @@ class LogoutConfirmView(LoginRequiredMixin, TemplateView):
     template_name = 'user/logout_confirm.html'
 
 
-class ProfileDisplay(LoginRequiredMixin, TemplateView):
+class ProfileDisplay(TemplateView):
     template_name = 'user/profile.html'
 
 

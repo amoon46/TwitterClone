@@ -15,7 +15,7 @@ profile
           </tr>
           <tr>
             <td>introduction</td>
-            <td>{% if user.introduction %}{{ user.introduction }}{% else %}未設定{% endif %}</td>
+            <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}未設定{% endif %}</td>
           </tr>
         </table>
     </div><br>
