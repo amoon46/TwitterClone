@@ -256,9 +256,9 @@ class TestLogoutView(TestCase):
 
 class TestUserProflieView(TestCase):
     def setUp(self):
-        self.url_profile = reverse('user:profile')
-        User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.url_profile = reverse('user:profile', args=[1])
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_profile)
@@ -268,15 +268,22 @@ class TestUserProflieView(TestCase):
 
 class TestUserProfileEditView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
+        self.user_1 = User.objects.create_user(
             email='test@gmail.com', password='Hogehoge777'
         )
+        self.user_2 = User.objects.create_user(
+            email='Hogehoge@gmail.com', password='Hogehoge777'
+        )
         self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
-        self.url_profile = reverse('user:profile')
-        self.url_update = reverse('user:profile_update')
+        self.url_profile_1 = reverse('user:profile', args=[1])
+        self.url_update_1 = reverse('user:profile_update', args=[1])
+        self.url_profile_2 = reverse('user:profile', args=[2])
+        self.url_update_2 = reverse('user:profile_update', args=[2])
+        self.url_profile_none = reverse('user:profile', args=[3])
+        self.url_update_none = reverse('user:profile_update', args=[3])
 
     def test_success_get(self):
-        self.response_get = self.client.get(self.url_update)
+        self.response_get = self.client.get(self.url_update_1)
         self.assertEquals(self.response_get.status_code, 200)
         self.assertTemplateUsed(self.response_get, 'user/profile_update.html')
 
@@ -285,14 +292,29 @@ class TestUserProfileEditView(TestCase):
             'nickname': 'yesman',
             'introduction': 'jimcarrey',
         }
-        self.response_post = self.client.post(self.url_update, self.data)
+        self.response_post = self.client.post(self.url_update_1, self.data)
 
         self.assertRedirects(
             self.response_post,
-            self.url_profile,
+            self.url_profile_1,
             status_code=302,
             target_status_code=200
         )
         user_object = User.objects.get(pk=1)
         self.assertEqual(user_object.nickname, self.data['nickname'])
         self.assertEqual(user_object.introduction, self.data['introduction'])
+
+    def test_failure_post_with_not_exists_user(self):
+        pass
+
+    def test_failure_post_with_incorrect_user(self):
+        self.data = {
+            'nickname': 'yesman',
+            'introduction': 'jimcarrey',
+        }
+        self.response_post_incorrect_user = self.client.post(self.url_update_2, self.data)
+
+        self.assertEqual(self.response_post_incorrect_user.status_code, 403)
+        user_object = User.objects.get(pk=2)
+        self.assertFalse(user_object.nickname, self.data['nickname'])
+        self.assertFalse(user_object.introduction, self.data['introduction'])

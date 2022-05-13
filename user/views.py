@@ -1,6 +1,6 @@
-from django.views.generic import TemplateView, CreateView, UpdateView
+from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib.auth import login
 
@@ -33,15 +33,21 @@ class LogoutConfirmView(LoginRequiredMixin, TemplateView):
     template_name = 'user/logout_confirm.html'
 
 
-class ProfileDisplay(TemplateView):
+class ProfileDisplay(LoginRequiredMixin, DetailView):
+    model = User
     template_name = 'user/profile.html'
 
 
-class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = User
     template_name = 'user/profile_update.html'
     fields = ('nickname', 'introduction')
-    success_url = reverse_lazy('user:profile')
 
-    def get_object(self):
-        return self.request.user
+    def get_success_url(self,  **kwargs):
+        pk = self.kwargs["pk"]
+        return reverse_lazy('user:profile', kwargs={"pk": pk})
+
+    def test_func(self, **kwargs):
+        pk = self.kwargs["pk"]
+        user = User.objects.get(pk=pk)
+        return user == self.request.user
