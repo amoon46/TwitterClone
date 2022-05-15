@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth import login
 
@@ -43,11 +44,11 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'user/profile_update.html'
     fields = ('nickname', 'introduction')
 
-    def get_success_url(self,  **kwargs):
+    def get_success_url(self):
         pk = self.kwargs["pk"]
         return reverse_lazy('user:profile', kwargs={"pk": pk})
 
-    def test_func(self, **kwargs):
+    def test_func(self):
         pk = self.kwargs["pk"]
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         return user == self.request.user
