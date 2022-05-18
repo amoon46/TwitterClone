@@ -279,8 +279,8 @@ class TestUserProfileEditView(TestCase):
         self.url_update_1 = reverse('user:profile_update', args=[1])
         self.url_profile_2 = reverse('user:profile', args=[2])
         self.url_update_2 = reverse('user:profile_update', args=[2])
-        self.url_profile_none = reverse('user:profile', args=[3])
-        self.url_update_none = reverse('user:profile_update', args=[3])
+        self.url_profile_none = reverse('user:profile', kwargs={'pk': 99})
+        self.url_update_none = reverse('user:profile_update', kwargs={'pk': 99})
 
     def test_success_get(self):
         self.response_get = self.client.get(self.url_update_1)
@@ -309,8 +309,8 @@ class TestUserProfileEditView(TestCase):
             'nickname': 'yesman',
             'introduction': 'jimcarrey',
         }
-        self.response_post_none_user = self.client.post(self.url_update_none, self.data)
-        self.assertEqual(self.response_post_none_user.status_code, 404)
+        response = self.client.get(self.url_update_none)
+        self.assertEqual(response.status_code, 404)
 
     def test_failure_post_with_incorrect_user(self):
         self.data = {
