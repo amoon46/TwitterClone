@@ -1,0 +1,31 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+login
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+  <br><br><div class="ui center aligned grid" ><h1>ログインよろしくおねがいしま〜〜〜す</h1></div><br>
+  <div class="ui segment">
+    <div class="d-flex align-items-center">
+      <form role="form" action="{% url 'user:login' %}" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <p>
+            {{ field }}<br>
+          </p>
+        {% endfor %}
+        {% if form.errors %}
+          <small style="color: red">{{ form.non_field_errors }}</small>
+        {% endif %}
+        <p></p>
+          <button class="btn btn-primary" type="submit">ログイン</button>
+          <a href="{% url 'user:signup' %}">新規登録へ</a>
+      </form>
+    <div>
+    <img class="ui fluid image" src="{% static 'images/rsa.jpg' %}">
+  <div>
+</div>
+{% endblock %}

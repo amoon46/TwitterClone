@@ -1,0 +1,24 @@
+{% extends 'twitter/base.html' %}
+
+{% block title %}
+profile
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+    <div class="content">
+      <br><div class="header"><h2>Profile</h2></div><br>
+        <table class="ui celled padded table">
+          <tr>
+            <td>ニックネーム</td>
+            <td>{% if user.nickname %}{{ user.nickname }}{% else %}未設定{% endif %}</td>
+          </tr>
+          <tr>
+            <td>introduction</td>
+            <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}未設定{% endif %}</td>
+          </tr>
+        </table>
+    </div><br>
+  <a class="ui button" href="{% url 'user:profile_update' user.pk %}">edit</a>
+</div>
+{% endblock %}
