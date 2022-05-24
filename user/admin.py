@@ -8,7 +8,7 @@ class MyUserAdmin(UserAdmin):
     # User編集画面の項目
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('nickname', 'introduction')}),
+        ('Personal info', {'fields': ('nickname', 'introduction', 'followees')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
                                     'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),

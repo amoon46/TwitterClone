@@ -1,0 +1,49 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+tweet_delete
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+    <br><div class="ui center aligned grid" ><h2>Flower divination</h2></div><br>
+    <img class="ui fluid image" src="{% static 'images/rose1.jpg' %}">
+    <div class="btn-group" role="group">
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+        <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">Don't</a>
+
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+        <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">Don't</a>
+
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+        <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">Don't</a>
+
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+        <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">Don't </a>
+
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+        <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">Don't </a>
+        <form class="ui form" method="post">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">delete</button>
+        </form>
+
+    <div>
+</div>
+{% endblock contents %}

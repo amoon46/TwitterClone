@@ -119,7 +119,7 @@ AUTH_USER_MODEL = 'user.User'
 # ログインページURLパス
 LOGIN_URL = 'user:login'
 # ログイン後のリダイレクト先URLパス
-LOGIN_REDIRECT_URL = 'twitter:home'
+LOGIN_REDIRECT_URL = 'tweet:top'
 # ログアウトページ用のURLパス
 LOGOUT_URL = 'user:logout'
 # ログアウト時のリダイレクト先URLパス

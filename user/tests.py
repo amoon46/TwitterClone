@@ -1,3 +1,4 @@
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import SESSION_KEY
@@ -7,7 +8,7 @@ from .models import User
 
 class TestSignUpView(TestCase):
     def setUp(self):
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.url_signup = reverse('user:signup')
 
     def test_success_get(self):
@@ -171,20 +172,20 @@ class TestSignUpView(TestCase):
 
 class TestHomeView(TestCase):
     def setUp(self):
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response = self.client.get(self.url_home)
         self.assertEquals(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'twitter/home.html')
+        self.assertTemplateUsed(self.response, 'tweet/top.html')
 
 
 class TestLoginView(TestCase):
     def setUp(self):
         self.url_login = reverse('user:login')
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):

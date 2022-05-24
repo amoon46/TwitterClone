@@ -1,0 +1,15 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+tweet_detail
+{% endblock title %}
+
+{% block contents %}
+<div class="container">
+  <div class="alert alert-success" role="alert">
+    <p>コメント：{{object.user}}</p>
+    <p>{{post.pk}}</p>
+  </div>
+</div>
+{% endblock contents %}
