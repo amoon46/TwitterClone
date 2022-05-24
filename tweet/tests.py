@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
+
 
 from user.models import User
 from .models import Post
@@ -65,12 +67,13 @@ class TestTweetCreateView(TestCase):
 class TestTweetDeleteView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
-        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.user = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
         self.url_home = reverse('tweet:top')
         self.url_profile = reverse('user:profile', args=[1])
         self.url_post_create = reverse('tweet:post_create')
 
     def test_success_post(self):
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.data = {
             'text': 'テストを試しています。',
         }
@@ -95,16 +98,34 @@ class TestTweetDeleteView(TestCase):
         )
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+
+        self.url_post_delete = reverse('tweet:post_delete', kwargs={'pk': 99})
+
+        # response = self.client.get(self.url_post_delete)
+        # self.assertEqual(response.status_code, 404)
 
     def test_failure_post_with_incorrect_user(self):
         pass
 
 
-"""
 class TestFollowView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.user = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.url_home = reverse('tweet:top')
+        self.url_profile = reverse('user:profile', args=[1])
+        self.url_post_create = reverse('tweet:post_create')
+
     def test_success_post(self):
-        pass
+        self.response_post = self.client.post(self.url_post_create, self.data)
+        self.assertRedirects(
+            self.response_post,
+            self.url_profile,
+            status_code=302,
+            target_status_code=200
+        )
 
     def test_failure_post_with_not_exist_user(self):
         pass
@@ -113,6 +134,7 @@ class TestFollowView(TestCase):
         pass
 
 
+"""
 class TestUnfollowView(TestCase):
     def test_success_post(self):
         pass
