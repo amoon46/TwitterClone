@@ -15,6 +15,7 @@ urlpatterns = [
     path('like/<int:pk>/detail/', views.LikeProfile.as_view(), name='like_profile'),
     path('like/<int:pk>/list/', views.LikeList.as_view(), name='like_list'),
     path('follow/<int:pk>/', views.UserFollow.as_view(), name='follow'),
+    path('unfollow/<int:pk>/', views.UserUnFollow.as_view(), name='unfollow'),
     path('followees/<int:pk>/list/', views.UserFolloweesList.as_view(), name='followees_list'),
     path('followers/<int:pk>/list/', views.UserFollowersList.as_view(), name='followers_list'),
 ]

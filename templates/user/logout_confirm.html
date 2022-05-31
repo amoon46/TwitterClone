@@ -9,7 +9,7 @@ logout
 <div class="ui text container">
   <p>
     <h2>Exitしますか？</h2>
-    <img class="ui medium image" src="{% static 'images/exit.jpeg' %}"><br>
+    <img class="ui medium image"style="padding-bottom: 2em" src="{% static 'images/exit.jpeg' %}">
     <a href="{% url 'user:logout' %}" class="btn btn-primary">logout</a>
     <a href="{% url 'tweet:top' %}" class="btn btn-outline-secondary">home</a>
   </p>

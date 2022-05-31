@@ -11,11 +11,10 @@ favorites_list
 
 {% block contents %}
 <div class="ui text container">
-  <br>
   {% for item in favories %}
       <div class="alert alert-primary" role="alert">
-          <p>author：{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{item.user.pk}}){% endif %}</p>
-          <p>{{item.text | linebreaksbr}}</p>
+          <p>author：{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{ item.user.pk }}){% endif %}</p>
+          <p>{{ item.text | linebreaksbr }}</p>
       </div>
   {% endfor %}
 </div>

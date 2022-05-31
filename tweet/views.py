@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.views import View
-from django.views.generic import ListView, CreateView, DetailView,  UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
 from .forms import PostForm
@@ -13,6 +13,9 @@ class TopView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'tweet/top.html'
     paginate_by = 25
+
+    def get_queryset(self):
+        return Post.objects.all().select_related('user').prefetch_related('like')
 
 
 class MyPostView(LoginRequiredMixin, ListView):
@@ -45,7 +48,7 @@ class OnlyYouMixin(UserPassesTestMixin):
 
     def test_func(self, **kwargs):
         pk = self.kwargs["pk"]
-        post = Post.objects.get(pk=pk)
+        post = get_object_or_404(Post, pk=pk)
         return post.user == self.request.user
 
 
@@ -56,7 +59,7 @@ class UpdatePost(LoginRequiredMixin, OnlyYouMixin, UpdateView):
 
     def get_success_url(self):
         pk_post = self.kwargs["pk"]
-        post = get_object_or_404(Post, pk=pk_post)
+        post = get_object_or_404(pk=pk_post)
         pk_user = post.user.pk
         return reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
@@ -69,7 +72,7 @@ class DeletePost(LoginRequiredMixin, OnlyYouMixin, DeleteView):
         pk_post = self.kwargs["pk"]
         post = get_object_or_404(Post, pk=pk_post)
         pk_user = post.user.pk
-        return reverse_lazy('user:profile', kwargs={"pk": pk_user})
+        reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
 
 ###############################################################
@@ -129,13 +132,26 @@ class UserFollow(LoginRequiredMixin, View):
         user = get_object_or_404(User, pk=pk)
         followees = login_user.followees.all()
 
-        if (user == login_user):
-            pass
-        else:
+        if (user != login_user):
             if user in followees:
-                login_user.followees.remove(user)
+                pass
             else:
                 login_user.followees.add(user)
+        return redirect('user:profile', pk)
+
+
+class UserUnFollow(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+
+        pk = self.kwargs['pk']
+        login_user = self.request.user
+        user = get_object_or_404(User, pk=pk)
+        followees = login_user.followees.all()
+
+        if (user != login_user):
+            if user in followees:
+                login_user.followees.remove(user)
         return redirect('user:profile', pk)
 
 

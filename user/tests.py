@@ -307,10 +307,6 @@ class TestUserProfileEditView(TestCase):
         self.assertEqual(user_object.introduction, self.data['introduction'])
 
     def test_failure_post_with_not_exists_user(self):
-        self.data = {
-            'nickname': 'yesman',
-            'introduction': 'jimcarrey',
-        }
         response = self.client.get(self.url_update_none)
         self.assertEqual(response.status_code, 404)
 

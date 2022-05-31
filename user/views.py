@@ -43,7 +43,7 @@ class ProfileDisplay(LoginRequiredMixin, DetailView):
         pk = self.kwargs['pk']
         user = get_object_or_404(User, pk=pk)
         context = super().get_context_data(*args, **kwargs)
-        context['Post'] = Post.objects.filter(user=user)
+        context['post'] = Post.objects.filter(user=user).select_related('user').prefetch_related('like')
         context['followers'] = User.objects.filter(followees=user)
 
         return context

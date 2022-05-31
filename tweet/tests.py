@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 
 
 from user.models import User
@@ -71,12 +70,12 @@ class TestTweetDeleteView(TestCase):
         self.url_home = reverse('tweet:top')
         self.url_profile = reverse('user:profile', args=[1])
         self.url_post_create = reverse('tweet:post_create')
-
-    def test_success_post(self):
-        self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.data = {
             'text': 'テストを試しています。',
         }
+
+    def test_success_post(self):
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.response_post = self.client.post(self.url_post_create, self.data)
         self.assertRedirects(
             self.response_post,
@@ -89,7 +88,7 @@ class TestTweetDeleteView(TestCase):
         self.assertEqual(post_object.text, self.data['text'])
 
         self.url_post_delete = reverse('tweet:post_delete', args=[1])
-        self.response_delete = self.client.post(self.url_post_delete, self.data)
+        self.response_delete = self.client.post(self.url_post_delete)
         self.assertRedirects(
             self.response_delete,
             self.url_profile,
@@ -99,14 +98,31 @@ class TestTweetDeleteView(TestCase):
 
     def test_failure_post_with_not_exist_tweet(self):
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-
-        self.url_post_delete = reverse('tweet:post_delete', kwargs={'pk': 99})
-
-        # response = self.client.get(self.url_post_delete)
-        # self.assertEqual(response.status_code, 404)
+        self.url_post_delete = reverse('tweet:post_delete', args=[99])
+        self.response_delete = self.client.get(self.url_post_delete)
+        self.assertEqual(self.response_delete.status_code, 404)
 
     def test_failure_post_with_incorrect_user(self):
-        pass
+        # 新しい投稿
+        self.client.login(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.response_post = self.client.post(self.url_post_create, self.data)
+        post_object = Post.objects.get(pk=1)
+        self.assertEqual(post_object.text, self.data['text'])
+
+        # 別のユーザーで削除
+"""
+        self.response_tweet_form = self.client.post(self.tweet_url, self.tweet_data)
+        self.client.logout()
+        self.login_user2 = self.client.login(username='kinopiko123@gmail.com', password='kinoko04')
+        self.response_top = self.client.get(self.top_url)
+        self.pk = self.response_top.context['object_list'][0].pk
+        self.delete_url = reverse('blog:tweet-delete', args=[self.pk])
+        self.response_delete = self.client.post(self.delete_url)
+        self.response_top = self.client.get(self.top_url)
+        self.assertEqual(self.response_delete.status_code, 403)
+        self.assertQuerysetEqual(self.user.post_set.all(), ['<Post: test1>'])
+        self.assertContains(self.response_top, 'test1')
+"""
 
 
 class TestFollowView(TestCase):
@@ -119,13 +135,7 @@ class TestFollowView(TestCase):
         self.url_post_create = reverse('tweet:post_create')
 
     def test_success_post(self):
-        self.response_post = self.client.post(self.url_post_create, self.data)
-        self.assertRedirects(
-            self.response_post,
-            self.url_profile,
-            status_code=302,
-            target_status_code=200
-        )
+        pass
 
     def test_failure_post_with_not_exist_user(self):
         pass
@@ -154,17 +164,30 @@ class TestFollowingListView(TestCase):
 class TestFollowerListView(TestCase):
     def test_success_get(self):
         pass
+"""
 
 
 class TestFavoriteView(TestCase):
-    def test_success_post(self):
-        pass
+    def setUp(self):
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.user = User.objects.create_user(email='@gmail.com', password='Hogehoge777')
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.url_home = reverse('tweet:top')
+        self.url_post_create = reverse('tweet:post_create')
 
-    def test_failure_post_with_not_exist_tweet(self):
-        pass
+    def test_success_get(self):
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.data = {
+            'text': 'テストを試しています。',
+        }
+        self.response_post = self.client.post(self.url_post_create, self.data)
+        post_object = Post.objects.get(pk=1)
+        self.assertEqual(post_object.text, self.data['text'])
 
-    def test_failure_post_with_favorited_tweet(self):
-        pass
+        self.url_follow = reverse('tweet:like_home', args=[1])
+
+        self.response_follow = self.client.get(self.url_follow)
+        # self.assertEquals(self.response_follow.status_code, 200)
 
 
 class TestUnFavoriteView(TestCase):
@@ -176,4 +199,3 @@ class TestUnFavoriteView(TestCase):
 
     def test_failure_post_with_unfavorited_tweet(self):
         pass
-"""

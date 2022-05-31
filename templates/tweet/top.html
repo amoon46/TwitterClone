@@ -11,19 +11,19 @@ Home
 
 {% block contents %}
 <div class="ui text container">
-  <br>
   {% for item in object_list %}
     <div class="alert alert-primary" role="alert">
         <p>author：<a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">
           {% if item.user.nickname %}{{ item.user.nickname }}
-          {% else %} I am a CAT ({{item.user.pk}}){% endif %}</td></a></p>
-        <p>{{item.text | linebreaksbr}}</p>
+          {% else %} I am a CAT ({{ item.user.pk }}){% endif %}</td></a></p>
+        <p>{{ item.text | linebreaksbr }}</p>
 
         {% if request.user in item.like.all %}
-        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{item.like.count}}
+        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{ item.like.count }}
         {% else %}
-        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{item.like.count}}
+        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{ item.like.count }}
         {% endif %}
+
     </div>
   {% endfor %}
 </div>

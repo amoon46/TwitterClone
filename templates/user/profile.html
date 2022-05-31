@@ -12,11 +12,11 @@ profile
 {% block contents %}
 <div class="ui text container">
     <div class="content">
-      <br><div class="header"><h2>Profile</h2></div>
+      <div class="header" style="padding-top: 1em"><h2>Profile</h2></div>
       <div class="text-right">
         {% if user == request.user %}
           <a class="ui right floated text-white button" href="{% url 'user:profile_update' user.pk %}">profile edit</a>
-        {% endif %}<br>
+        {% endif %}
       </div>
 
         <table class="ui celled padded table">
@@ -25,9 +25,9 @@ profile
             <td>{% if user.nickname %}{{ user.nickname }}{% else %}I don't have a name yet. ({{user.pk}}){% endif %}
               {% if user != request.user %}
                 {% if user in request.user.followees.all %}
-                <a href="{% url 'tweet:follow' user.pk %}" class="ui right floated red button"  role="button">unfollow</a>
+                  <a href="{% url 'tweet:unfollow' user.pk %}" class="ui right floated red button"  role="button">unfollow</a>
                 {% else %}
-                <a href="{% url 'tweet:follow' user.pk %}" class="ui right floated blue button" role="button">follow</a>
+                  <a href="{% url 'tweet:follow' user.pk %}" class="ui right floated blue button" role="button">follow</a>
                 {% endif %}
               {% endif %}
             </td>
@@ -36,10 +36,6 @@ profile
             <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}Not set{% endif %}</td>
           </tr>
         </table>
-
-
-
-
 
         <table class="ui celled padded table">
           <thead>
@@ -65,12 +61,7 @@ profile
           </tr></tfoot>
         </table>
 
-
-
-
-
-
-        {% for item in Post %}
+        {% for item in post %}
         {% if user == item.user %}
         <div class="alert alert-primary" role="alert">
             <p>author：<a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{item.user.pk}}){% endif %}</td></a></p>
@@ -89,6 +80,6 @@ profile
         </div>
       {% endif %}
       {% endfor %}
-    </div><br>
+    </div>
 </div>
 {% endblock %}

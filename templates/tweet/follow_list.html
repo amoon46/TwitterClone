@@ -6,13 +6,16 @@ followlist
 {% endblock title %}
 
 {% block contents %}
-<div class="ui text container"><br>
+<div class="ui text container">
   {% for user in object_list %}
     <div class="alert alert-info" role="alert">
       <table class="ui celled padded table">
         <tr>
           <td>nickname</td>
-          <td>{% if user.nickname %}{{ user.nickname }}{% else %}I don't have a name yet. ({{user.pk}}){% endif %}</td>
+          <td><a href="{% url 'user:profile' user.pk  %}" class="alert-link">
+            {% if user.nickname %}{{ user.nickname }}
+            {% else %}I don't have a name yet. ({{ user.pk }}){% endif %}</a>
+          </td>
         </tr>
           <td>introduction</td>
           <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}未設定{% endif %}</td>

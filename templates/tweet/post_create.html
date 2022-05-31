@@ -9,9 +9,9 @@ tweet_create
 <div class="ui text container">
 	<div class="ui content">
 		<form class="ui form" action="" method="POST">
-			<br>{% csrf_token %}
+			{% csrf_token %}
 			<div class="field tweet">
-				<h3>What's happening?</h3>
+				<h3 style="padding-top: 1em">What's happening?</h3>
 				{{ form.text }}
 			</div>
 			<div class="ui error message">{{ form.non_field_errors }}</div>
