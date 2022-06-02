@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
@@ -59,7 +60,7 @@ class UpdatePost(LoginRequiredMixin, OnlyYouMixin, UpdateView):
 
     def get_success_url(self):
         pk_post = self.kwargs["pk"]
-        post = get_object_or_404(pk=pk_post)
+        post = get_object_or_404(Post, pk=pk_post)
         pk_user = post.user.pk
         return reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
@@ -72,7 +73,7 @@ class DeletePost(LoginRequiredMixin, OnlyYouMixin, DeleteView):
         pk_post = self.kwargs["pk"]
         post = get_object_or_404(Post, pk=pk_post)
         pk_user = post.user.pk
-        reverse_lazy('user:profile', kwargs={"pk": pk_user})
+        return reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
 
 ###############################################################

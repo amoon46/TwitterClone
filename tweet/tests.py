@@ -6,6 +6,35 @@ from user.models import User
 from .models import Post
 
 
+class HomeView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.user = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.url_home = reverse('tweet:top')
+        self.url_post_create = reverse('tweet:post_create')
+        self.data1 = {
+            'text': 'test1。',
+        }
+        self.data2 = {
+            'text': 'test2',
+        }
+        self.data3 = {
+            'text': 'test3',
+        }
+
+    def test_success_get(self):
+        self.client.login(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.response_post1 = self.client.post(self.url_post_create, self.data1)
+        self.assertTrue(Post.objects.exists())
+
+        post_object = Post.objects.get(pk=1)
+        self.assertEqual(post_object.text, self.data1['text'])
+
+
+class UserProfiileView(TestCase):
+    pass
+
+
 class TestTweetCreateView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
@@ -110,32 +139,35 @@ class TestTweetDeleteView(TestCase):
         self.assertEqual(post_object.text, self.data['text'])
 
         # 別のユーザーで削除
-"""
-        self.response_tweet_form = self.client.post(self.tweet_url, self.tweet_data)
         self.client.logout()
-        self.login_user2 = self.client.login(username='kinopiko123@gmail.com', password='kinoko04')
-        self.response_top = self.client.get(self.top_url)
-        self.pk = self.response_top.context['object_list'][0].pk
-        self.delete_url = reverse('blog:tweet-delete', args=[self.pk])
-        self.response_delete = self.client.post(self.delete_url)
-        self.response_top = self.client.get(self.top_url)
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        self.url_post_delete = reverse('tweet:post_delete', args=[1])
+        self.response_delete = self.client.post(self.url_post_delete)
         self.assertEqual(self.response_delete.status_code, 403)
-        self.assertQuerysetEqual(self.user.post_set.all(), ['<Post: test1>'])
-        self.assertContains(self.response_top, 'test1')
-"""
 
 
 class TestFollowView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
-        self.user = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
-        self.client.login(email='test@gmail.com', password='Hogehoge777')
-        self.url_home = reverse('tweet:top')
-        self.url_profile = reverse('user:profile', args=[1])
-        self.url_post_create = reverse('tweet:post_create')
+        self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
+        self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.url_profile1 = reverse('user:profile', kwargs={'pk': self.user1.pk})
+        self.url_profile2 = reverse('user:profile', kwargs={'pk': self.user2.pk})
+        self.url_post_follow1 = reverse('tweet:follow',  kwargs={'pk': self.user1.pk})
+        self.url_post_follow2 = reverse('tweet:follow',  kwargs={'pk': self.user2.pk})
 
     def test_success_post(self):
-        pass
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
+        response = self.client.post(self.url_post_follow2)
+        self.assertEqual(response.status_code, 302)
+
+        """
+            self.assertRedirects(
+            self.response_follow,
+            self.url_profile,
+            status_code=302,
+            target_status_code=200
+            )
+        """
 
     def test_failure_post_with_not_exist_user(self):
         pass
@@ -171,7 +203,6 @@ class TestFavoriteView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.user = User.objects.create_user(email='@gmail.com', password='Hogehoge777')
-        self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.url_home = reverse('tweet:top')
         self.url_post_create = reverse('tweet:post_create')
 
