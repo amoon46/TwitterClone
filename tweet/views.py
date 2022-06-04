@@ -19,14 +19,6 @@ class TopView(LoginRequiredMixin, ListView):
         return Post.objects.all().select_related('user').prefetch_related('like')
 
 
-class MyPostView(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'user/profile.html'
-
-    def get_queryset(self):
-        return Post.objects.filter(user=self.request.user)
-
-
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -79,33 +71,41 @@ class DeletePost(LoginRequiredMixin, OnlyYouMixin, DeleteView):
 ###############################################################
 # like
 
-class LikeBase(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+class Like(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
-        related_post = get_object_or_404(Post, pk=pk)
-        if self.request.user in related_post.like.all():
-            obj = related_post.like.remove(self.request.user)
+        post = get_object_or_404(Post, pk=pk)
+        if self.request.user in post.like.all():
+            pass
         else:
-            obj = related_post.like.add(self.request.user)
-        return obj
+            post.like.add(self.request.user)
+        likes_count = post.like.count()
+        liked = True
+        context = {
+            'post_pk': post.pk,
+            'likes_count': likes_count,
+            'liked': liked,
+        }
+        return JsonResponse(context)
 
 
-class LikeHome(LikeBase):
+class UnLike(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-        return redirect('tweet:top')
-
-
-class LikeProfile(LikeBase):
-
-    def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-        pk_post = self.kwargs["pk"]
-        post = get_object_or_404(Post, pk=pk_post)
-        pk_user = post.user.pk
-        return redirect('user:profile', pk_user)
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        post = get_object_or_404(Post, pk=pk)
+        if self.request.user in post.like.all():
+            post.like.remove(self.request.user)
+        likes_count = post.like.count()
+        liked = False
+        context = {
+            'post_pk': post.pk,
+            'likes_count': likes_count,
+            'liked': liked,
+        }
+        return JsonResponse(context)
 
 
 class LikeList(LoginRequiredMixin, ListView):
@@ -126,7 +126,7 @@ class LikeList(LoginRequiredMixin, ListView):
 
 class UserFollow(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         pk = self.kwargs['pk']
         login_user = self.request.user
@@ -143,7 +143,7 @@ class UserFollow(LoginRequiredMixin, View):
 
 class UserUnFollow(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         pk = self.kwargs['pk']
         login_user = self.request.user

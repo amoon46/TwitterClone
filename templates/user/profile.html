@@ -16,6 +16,19 @@ profile
       <div class="text-right">
         {% if user == request.user %}
           <a class="ui right floated text-white button" href="{% url 'user:profile_update' user.pk %}">profile edit</a>
+
+        {% else %}
+          {% if user in request.user.followees.all %}
+            <form class="ui form" action="{% url 'tweet:unfollow' pk=user.pk %}" method="POST">
+              {% csrf_token %}
+              <button class="ui right floated red button" type="submit">unfollow</button>
+            </form>
+          {% else %}
+            <form class="ui form" action="{% url 'tweet:follow' pk=user.pk %}" method="POST">
+              {% csrf_token %}
+              <button class="ui right floated blue button" type="submit">follow</button>
+            </form>
+          {% endif %}
         {% endif %}
       </div>
 
@@ -23,13 +36,6 @@ profile
           <tr>
             <td>nickname</td>
             <td>{% if user.nickname %}{{ user.nickname }}{% else %}I don't have a name yet. ({{user.pk}}){% endif %}
-              {% if user != request.user %}
-                {% if user in request.user.followees.all %}
-                  <a href="{% url 'tweet:unfollow' user.pk %}" class="ui right floated red button"  role="button">unfollow</a>
-                {% else %}
-                  <a href="{% url 'tweet:follow' user.pk %}" class="ui right floated blue button" role="button">follow</a>
-                {% endif %}
-              {% endif %}
             </td>
           </tr>
             <td>introduction</td>
@@ -68,9 +74,9 @@ profile
             <p>{{item.text | linebreaksbr}}</p>
 
             {% if request.user in item.like.all %}
-            <a href="{% url 'tweet:like_profile' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{item.like.count}}
+            <a href="{% url 'tweet:unlike' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{item.like.count}}
             {% else %}
-            <a href="{% url 'tweet:like_profile' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{item.like.count}}
+            <a href="{% url 'tweet:like' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{item.like.count}}
             {% endif %}
 
             {%if item.user == request.user %}

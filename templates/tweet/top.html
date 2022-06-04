@@ -19,9 +19,15 @@ Home
         <p>{{ item.text | linebreaksbr }}</p>
 
         {% if request.user in item.like.all %}
-        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{ item.like.count }}
+          <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
+            <i class="fas fa-thumbs-up"></i>
+            <span>{{ post.like_set.count }}</span>
+          </button>
         {% else %}
-        <a href="{% url 'tweet:like_home' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{ item.like.count }}
+          <button class="like" data-url="{% url 'tweet:like' item.pk %}">
+            <i class="far fa-thumbs-up"></i>
+            <span>{{ post.like_set.count }}</span>
+          </button>
         {% endif %}
 
     </div>

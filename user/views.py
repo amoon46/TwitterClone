@@ -40,10 +40,9 @@ class ProfileDisplay(LoginRequiredMixin, DetailView):
     template_name = 'user/profile.html'
 
     def get_context_data(self, *args, **kwargs):
-        pk = self.kwargs['pk']
-        user = get_object_or_404(User, pk=pk)
+        user = self.object
         context = super().get_context_data(*args, **kwargs)
-        context['post'] = Post.objects.filter(user=user).select_related('user').prefetch_related('like')
+        context['post'] = Post.objects.filter(user=user).select_related('user')
         context['followers'] = User.objects.filter(followees=user)
 
         return context
