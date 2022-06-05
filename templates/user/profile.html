@@ -56,7 +56,7 @@ profile
                 <a href="{% url 'tweet:like_list' user.pk %}">{{ user.related_post.count }}</a>
               </td>
               <td class="ui center aligned header">
-                <a href="{% url 'tweet:followees_list' user.pk %}">{{ user.followees.count }}</a>
+                <a href="{% url 'tweet:following_list' user.pk %}">{{ user.followees.count }}</a>
               </td>
               <td class="ui center aligned header">
                 <a href="{% url 'tweet:followers_list' user.pk %}">{{ followers.count}}</a>
@@ -71,13 +71,19 @@ profile
         {% if user == item.user %}
         <div class="alert alert-primary" role="alert">
             <p>author：<a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{item.user.pk}}){% endif %}</td></a></p>
-            <p>{{item.text | linebreaksbr}}</p>
+            <p><a href="{% url 'tweet:post_detail' item.pk  %}" class="alert-link">{{ item.text | linebreaksbr }}</p>
 
             {% if request.user in item.like.all %}
-            <a href="{% url 'tweet:unlike' item.pk %}" class="like-btn add-color"  role="button"><i class="fas fa-heart"></i></a>{{item.like.count}}
-            {% else %}
-            <a href="{% url 'tweet:like' item.pk %}" class="like-btn" role="button"><i class="far fa-heart"></i></a>{{item.like.count}}
-            {% endif %}
+            <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
+              <i class="fas fa-heart" style="color:red"></i>
+              <span>{{ post.like_set.count }}</span>
+            </button>
+          {% else %}
+            <button class="like" data-url="{% url 'tweet:like' item.pk %}">
+              <i class="far fa-heart" style="color:red"></i>
+              <span>{{ post.like_set.count }}</span>
+            </button>
+          {% endif %}
 
             {%if item.user == request.user %}
               <a href="{% url 'tweet:post_update' item.pk %}" class="btn btn-outline-secondary ms-3">edit</a>

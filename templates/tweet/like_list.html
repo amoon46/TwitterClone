@@ -11,10 +11,16 @@ favorites_list
 
 {% block contents %}
 <div class="ui text container">
+  <div class="header" style="padding-top: 1em"><h2>Profile</h2></div>
+  <a href="{% url 'user:profile' user.pk %}" class="btn btn-outline-secondary">return profile</a>
+  <div class="header" style="padding-top: 1em"></div>
+  {{ user.nickname }}
   {% for item in favories %}
       <div class="alert alert-primary" role="alert">
-          <p>author：{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{ item.user.pk }}){% endif %}</p>
-          <p>{{ item.text | linebreaksbr }}</p>
+        <p>author : <a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">
+          {% if item.user.nickname %}{{ item.user.nickname }}
+          {% else %} I am a CAT ({{ item.user.pk }}){% endif %}</td></a></p>
+        <p><a href="{% url 'tweet:post_detail' item.pk  %}" class="alert-link">{{ item.text | linebreaksbr }}</a></p>
       </div>
   {% endfor %}
 </div>

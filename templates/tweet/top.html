@@ -11,25 +11,26 @@ Home
 
 {% block contents %}
 <div class="ui text container">
+  <div class="header" style="padding-top: 1em"></div>
   {% for item in object_list %}
     <div class="alert alert-primary" role="alert">
-        <p>author：<a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">
+        <p>author : <a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">
           {% if item.user.nickname %}{{ item.user.nickname }}
           {% else %} I am a CAT ({{ item.user.pk }}){% endif %}</td></a></p>
-        <p>{{ item.text | linebreaksbr }}</p>
+        <p><a href="{% url 'tweet:post_detail' item.pk  %}" class="alert-link">{{ item.text | linebreaksbr }}</a></p>
 
         {% if request.user in item.like.all %}
           <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
-            <i class="fas fa-thumbs-up"></i>
-            <span>{{ post.like_set.count }}</span>
+            <i class="fas fa-heart" style="color:red"></i>
+            <span>{{ post.like.count }}</span>
           </button>
         {% else %}
           <button class="like" data-url="{% url 'tweet:like' item.pk %}">
-            <i class="far fa-thumbs-up"></i>
-            <span>{{ post.like_set.count }}</span>
+            <i class="far fa-heart" style="color:red"></i>
+            <span>{{ post.like.count }}</span>
           </button>
         {% endif %}
-
+        <span>{{ post.like.count }}</span>
     </div>
   {% endfor %}
 </div>

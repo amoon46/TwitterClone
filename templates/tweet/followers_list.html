@@ -1,0 +1,23 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+followlist
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+  <div class="header" style="padding-top: 1em"><h2>follower</h2>of {{ user.nickname }}</div>
+  <a href="{% url 'user:profile' user.pk %}" class="ui right floated text-white button">return profile</a>
+  <div class="header" style="padding-top: 3em"></div>
+
+  {% for user in follow %}
+    <div class="alert alert-primary" role="alert">
+          <p>nickname : <a href="{% url 'user:profile' user.pk  %}" class="alert-link">
+            {% if user.nickname %}{{ user.nickname }}
+            {% else %}I don't have a name yet. ({{ user.pk }}){% endif %}</a>
+          <p>introduction : {% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}未設定{% endif %}</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

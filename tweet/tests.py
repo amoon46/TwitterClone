@@ -5,7 +5,7 @@ from django.urls import reverse
 from user.models import User
 from .models import Post
 
-
+"""
 class HomeView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
@@ -144,6 +144,7 @@ class TestTweetDeleteView(TestCase):
         self.url_post_delete = reverse('tweet:post_delete', args=[1])
         self.response_delete = self.client.post(self.url_post_delete)
         self.assertEqual(self.response_delete.status_code, 403)
+"""
 
 
 class TestFollowView(TestCase):
@@ -157,17 +158,15 @@ class TestFollowView(TestCase):
 
     def test_success_post(self):
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-        response = self.client.post(self.url_post_follow2)
-        self.assertEqual(response.status_code, 302)
-
-        """
-            self.assertRedirects(
+        self.response_follow = self.client.post(self.url_post_follow2)
+        self.assertRedirects(
             self.response_follow,
-            self.url_profile,
+            self.url_profile2,
             status_code=302,
             target_status_code=200
-            )
-        """
+        )
+        self.assertTrue(User.objects.filter(
+            followees=self.user2).exists())
 
     def test_failure_post_with_not_exist_user(self):
         pass

@@ -6,10 +6,17 @@ tweet_detail
 {% endblock title %}
 
 {% block contents %}
-<div class="container">
-  <div class="alert alert-success" role="alert">
-    <p>コメント：{{ object.user }}</p>
-    <p>{{ post.pk }}</p>
+<div class="ui text container">
+  <div class="header" style="padding-top: 1em"></div>
+  <div class="alert alert-primary" role="alert">
+    <p>autho : <a href="{% url 'user:profile' post.user.pk  %}" class="alert-link">
+      {% if post.user.nickname %}{{ post.user.nickname }}
+      {% else %} I am a CAT ({{ post.user.pk }}){% endif %}</td></a></p>
+    <p>content : {{ post.text | linebreaksbr }}</p>
+    <p>created_at : {{ post.created_at }}</p>
+    <p>liked : {{ post.like.count }}</p>
   </div>
+  <a href="{% url 'user:profile' post.user.pk %}" class="btn btn-outline-secondary">return profile</a>
+  <a href="{% url 'tweet:top' %}" class="ui right floated button">home</a>
 </div>
 {% endblock contents %}

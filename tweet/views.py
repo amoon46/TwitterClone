@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -135,9 +136,11 @@ class UserFollow(LoginRequiredMixin, View):
 
         if (user != login_user):
             if user in followees:
-                pass
+                messages.warning(request, 'you have already followed')
             else:
                 login_user.followees.add(user)
+        else:
+            messages.warning(request, 'you can not follow yourself')
         return redirect('user:profile', pk)
 
 
@@ -153,26 +156,32 @@ class UserUnFollow(LoginRequiredMixin, View):
         if (user != login_user):
             if user in followees:
                 login_user.followees.remove(user)
+            else:
+                messages.warning(request, 'you do not unfollow because not following')
+        else:
+            messages.warning(request, 'you can not unfollow yourself')
         return redirect('user:profile', pk)
 
 
-class UserFolloweesList(LoginRequiredMixin, ListView):
+class UserFollowingList(LoginRequiredMixin, DetailView):
     model = User
-    template_name = 'tweet/follow_list.html'
+    template_name = 'tweet/following_list.html'
 
-    def get_queryset(self, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         pk = self.kwargs['pk']
         user = get_object_or_404(User, pk=pk)
+        context = super().get_context_data(*args, **kwargs)
+        context['follow'] = user.followees.all()
+        return context
 
-        return user.followees.all()
 
-
-class UserFollowersList(LoginRequiredMixin, ListView):
+class UserFollowersList(LoginRequiredMixin, DetailView):
     model = User
-    template_name = 'tweet/follow_list.html'
+    template_name = 'tweet/followers_list.html'
 
-    def get_queryset(self, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         pk = self.kwargs['pk']
         user = get_object_or_404(User, pk=pk)
-
-        return User.objects.filter(followees=user)
+        context = super().get_context_data(*args, **kwargs)
+        context['follow'] = User.objects.filter(followees=user)
+        return context

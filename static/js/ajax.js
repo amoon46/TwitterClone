@@ -29,21 +29,26 @@ $.ajaxSetup({
 $('.like').on('click', function (event) {
 	event.preventDefault();
 	const url = $(this).attr('data-url');
+	const split_url = $(this).attr('data-url').split('/');
 	const csrftoken = getCookie('csrftoken');
-	const selector = $(this)
+	const el = $(this)
+	const like_css = "far fa-heart"
+	const unlike_css = "fas fa-heart"
 	$.ajax({
 		headers: { 'X-CSRFToken': csrftoken },
 		type: 'POST',
 		url: url,
 		dataType: 'json',
 		success: function (response) {
-			selector.children('span').text(response.likes_count);
+			el.children('span').text(response.likes_count);
 			if (response.liked) {
-				selector.attr('data-url', '/unlike/num/'.replace(/num/, response.post_pk));
-				selector.children('i').attr('class', 'fas fa-thumbs-up')
+				unlike = el.attr('data-url').replace(split_url[2], 'unlike');
+				el.attr('data-url', unlike);
+				el.children('i').attr('class', unlike_css)
 			} else {
-				selector.attr('data-url', '/like/num/'.replace(/num/, response.post_pk));
-				selector.children('i').attr('class', 'far fa-thumbs-up')
+				like = el.attr('data-url').replace(split_url[2], 'like');
+				el.attr('data-url', like);
+				el.children('i').attr('class', like_css)
 			}
 		}
 	});
