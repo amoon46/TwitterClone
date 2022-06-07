@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
@@ -5,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
 
 from .forms import PostForm
 from .models import Post
@@ -40,9 +42,11 @@ class DetailPost(LoginRequiredMixin, DetailView):
 class OnlyYouMixin(UserPassesTestMixin):
     raise_exception = True
 
-    def test_func(self, **kwargs):
+    def test_func(self):
         pk = self.kwargs["pk"]
         post = get_object_or_404(Post, pk=pk)
+        if (post.user != self.request.user):
+            messages.warning(self.request, 'This user is not login user')
         return post.user == self.request.user
 
 
@@ -134,13 +138,16 @@ class UserFollow(LoginRequiredMixin, View):
         user = get_object_or_404(User, pk=pk)
         followees = login_user.followees.all()
 
-        if (user != login_user):
+        if ((user != login_user) and (user != 404)):
             if user in followees:
-                messages.warning(request, 'you have already followed')
+                pass
             else:
                 login_user.followees.add(user)
+        elif (user == 404):
+            messages.warning(request, 'This user do not exist')
         else:
             messages.warning(request, 'you can not follow yourself')
+            raise PermissionDenied()
         return redirect('user:profile', pk)
 
 
@@ -157,9 +164,10 @@ class UserUnFollow(LoginRequiredMixin, View):
             if user in followees:
                 login_user.followees.remove(user)
             else:
-                messages.warning(request, 'you do not unfollow because not following')
+                pass
         else:
             messages.warning(request, 'you can not unfollow yourself')
+            raise PermissionDenied()
         return redirect('user:profile', pk)
 
 
@@ -171,7 +179,7 @@ class UserFollowingList(LoginRequiredMixin, DetailView):
         pk = self.kwargs['pk']
         user = get_object_or_404(User, pk=pk)
         context = super().get_context_data(*args, **kwargs)
-        context['follow'] = user.followees.all()
+        context['following'] = user.followees.all()
         return context
 
 
@@ -183,5 +191,5 @@ class UserFollowersList(LoginRequiredMixin, DetailView):
         pk = self.kwargs['pk']
         user = get_object_or_404(User, pk=pk)
         context = super().get_context_data(*args, **kwargs)
-        context['follow'] = User.objects.filter(followees=user)
+        context['followers'] = User.objects.filter(followees=user)
         return context

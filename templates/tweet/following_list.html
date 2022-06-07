@@ -11,7 +11,7 @@ followlist
   <a href="{% url 'user:profile' user.pk %}" class="ui right floated text-white button">return profile</a>
   <div class="header" style="padding-top: 3em"></div>
 
-  {% for user in follow %}
+  {% for user in following %}
     <div class="alert alert-primary" role="alert">
           <p>nickname : <a href="{% url 'user:profile' user.pk  %}" class="alert-link">
             {% if user.nickname %}{{ user.nickname }}

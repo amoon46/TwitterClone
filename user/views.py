@@ -44,7 +44,6 @@ class ProfileDisplay(LoginRequiredMixin, DetailView):
         context = super().get_context_data(*args, **kwargs)
         context['post'] = Post.objects.filter(user=user).select_related('user')
         context['followers'] = User.objects.filter(followees=user)
-
         return context
 
 
