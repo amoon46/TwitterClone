@@ -113,18 +113,6 @@ class UnLike(LoginRequiredMixin, View):
         return JsonResponse(context)
 
 
-class LikeList(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'tweet/like_list.html'
-
-    def get_context_data(self, *args, **kwargs):
-        pk = self.kwargs['pk']
-        user = get_object_or_404(User, pk=pk)
-        context = super().get_context_data(*args, **kwargs)
-        context['favories'] = Post.objects.filter(like=user)
-        return context
-
-
 ###############################################################
 # follow
 

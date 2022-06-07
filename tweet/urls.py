@@ -12,7 +12,6 @@ urlpatterns = [
     path('posts/<int:pk>/delete/', views.DeletePost.as_view(), name='post_delete'),
     path('like/<int:pk>/', views.Like.as_view(), name='like'),
     path('unlike/<int:pk>/', views.UnLike.as_view(), name='unlike'),
-    path('like/<int:pk>/list/', views.LikeList.as_view(), name='like_list'),
     path('follow/<int:pk>/', views.UserFollow.as_view(), name='follow'),
     path('unfollow/<int:pk>/', views.UserUnFollow.as_view(), name='unfollow'),
     path('following/<int:pk>/list/', views.UserFollowingList.as_view(), name='following_list'),

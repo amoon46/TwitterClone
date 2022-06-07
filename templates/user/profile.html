@@ -53,7 +53,7 @@ profile
           <tbody>
             <tr>
               <td class="ui center aligned header">
-                <a href="{% url 'tweet:like_list' user.pk %}">{{ user.related_post.count }}</a>
+                <a>{{ user.related_post.count }}</a>
               </td>
               <td class="ui center aligned header">
                 <a href="{% url 'tweet:following_list' user.pk %}">{{ user.followees.count }}</a>
