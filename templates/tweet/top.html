@@ -22,15 +22,14 @@ Home
         {% if request.user in item.like.all %}
           <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
             <i class="fas fa-heart" style="color:red"></i>
-            <span>{{ post.like.count }}</span>
+            <span>{{ item.like.count }}</span>
           </button>
         {% else %}
           <button class="like" data-url="{% url 'tweet:like' item.pk %}">
             <i class="far fa-heart" style="color:red"></i>
-            <span>{{ post.like.count }}</span>
+            <span>{{ item.like.count }}</span>
           </button>
         {% endif %}
-        <span>{{ post.like.count }}</span>
     </div>
   {% endfor %}
 </div>

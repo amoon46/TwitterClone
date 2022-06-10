@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.messages import get_messages
 import json
-import time
 
 
 from user.models import User
@@ -13,15 +12,14 @@ class HomeView(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
-        self.post = Post.objects.create(text='テストを試しています。', user=self.user1)
-        time.sleep(0.1)
+        self.post1 = Post.objects.create(text='テストを試しています。', user=self.user1)
         self.post2 = Post.objects.create(text='別の人がテストを試しています。', user=self.user2)
         self.url_home = reverse('tweet:top')
 
     def test_success_get_tweet(self):
-        self.client.login(email='hogehoge@gmail.com', password='Hogehoge777')
+        self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.response_get = self.client.get(self.url_home)
-        self.assertContains(self.response_get, self.post.text)
+        self.assertContains(self.response_get, self.post1.text)
         self.assertContains(self.response_get, self.post2.text)
         self.assertQuerysetEqual(
             self.response_get.context['post_list'],
@@ -36,24 +34,23 @@ class UserProfiileView(TestCase):
         self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
         self.user3 = User.objects.create_user(email='ho@gmail.com', password='Hogehoge777')
-        self.post = Post.objects.create(text='テストを試しています。', user=self.user1)
-        time.sleep(0.1)
+        self.post1 = Post.objects.create(text='テストを試しています。', user=self.user1)
         self.post2 = Post.objects.create(text='別の人がテストを試しています。', user=self.user2)
-        time.sleep(0.1)
         self.post3 = Post.objects.create(text='user1がテストしています', user=self.user1)
-        # フォロー数
         self.url_profile1 = reverse('user:profile', kwargs={'pk': self.user1.pk})
+        # フォロー数
+        self.user1.followees.add(self.user2)
+        self.user1.followees.add(self.user3)
+        self.user2.followees.add(self.user1)
+        self.user2.followees.add(self.user3)
         self.url_following = reverse('tweet:following_list', kwargs={'pk': self.user1.pk})
         self.url_followers = reverse('tweet:followers_list', kwargs={'pk': self.user1.pk})
-        self.url_post_follow3 = reverse('tweet:follow',  kwargs={'pk': self.user3.pk})
-        self.url_post_follow2 = reverse('tweet:follow',  kwargs={'pk': self.user2.pk})
-        self.url_post_follow1 = reverse('tweet:follow',  kwargs={'pk': self.user1.pk})
 
     def test_success_get_tweet(self):
         self.client.login(email='hogehoge@gmail.com', password='Hogehoge777')
         self.response_get = self.client.get(self.url_profile1)
 
-        self.assertContains(self.response_get, self.post.text)
+        self.assertContains(self.response_get, self.post1.text)
         self.assertContains(self.response_get, self.post3.text)
 
         self.assertQuerysetEqual(
@@ -63,13 +60,7 @@ class UserProfiileView(TestCase):
         )
 
     def test_success_get_follow(self):
-        self.client.login(email='hogehoge@gmail.com', password='Hogehoge777')
-        self.client.post(self.url_post_follow1)
-        self.client.post(self.url_post_follow3)
-        self.client.logout()
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-        self.client.post(self.url_post_follow2)
-        self.client.post(self.url_post_follow3)
         self.response_get_following = self.client.get(self.url_following)
         following_count = self.response_get_following.context['following'].all().count()
         self.assertEqual(following_count, 2)
@@ -130,8 +121,6 @@ class TestTweetCreateView(TestCase):
 class TestTweetDetailView(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
-        self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
-        self.url_home = reverse('tweet:top')
         self.url_profile = reverse('user:profile', kwargs={'pk': self.user1.pk})
         self.post = Post.objects.create(text='テストを試しています。', user=self.user1)
         self.url_post_detail = reverse('tweet:post_detail', kwargs={'pk': self.post.pk})
@@ -152,7 +141,6 @@ class TestTweetDeleteView(TestCase):
         self.url_profile = reverse('user:profile', kwargs={'pk': self.user1.pk})
         self.client.login(email='test@gmail.com', password='Hogehoge777')
         self.post = Post.objects.create(text='テストを試しています。', user=self.user1)
-        self.assertTrue(Post.objects.exists())
 
     def test_success_post(self):
         self.url_post_delete = reverse('tweet:post_delete', kwargs={'pk': self.post.pk})
@@ -188,8 +176,8 @@ class TestFollowView(TestCase):
         self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
         self.url_profile2 = reverse('user:profile', kwargs={'pk': self.user2.pk})
-        self.url_post_follow2 = reverse('tweet:follow',  kwargs={'pk': self.user2.pk})
         self.url_post_follow1 = reverse('tweet:follow',  kwargs={'pk': self.user1.pk})
+        self.url_post_follow2 = reverse('tweet:follow',  kwargs={'pk': self.user2.pk})
         self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_post(self):
@@ -226,14 +214,10 @@ class TestUnfollowView(TestCase):
         self.user1 = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.user2 = User.objects.create_user(email='hogehoge@gmail.com', password='Hogehoge777')
         self.url_profile2 = reverse('user:profile', kwargs={'pk': self.user2.pk})
-        self.url_post_follow2 = reverse('tweet:follow',  kwargs={'pk': self.user2.pk})
-        self.url_post_follow1 = reverse('tweet:follow',  kwargs={'pk': self.user1.pk})
-        self.url_post_unfollow2 = reverse('tweet:unfollow',  kwargs={'pk': self.user2.pk})
         self.url_post_unfollow1 = reverse('tweet:unfollow',  kwargs={'pk': self.user1.pk})
+        self.url_post_unfollow2 = reverse('tweet:unfollow',  kwargs={'pk': self.user2.pk})
+        self.user1.followees.add(self.user2)
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-        self.client.post(self.url_post_follow2)
-        self.assertTrue(User.objects.filter(
-            followees=self.user2).exists())
 
     def test_success_post(self):
         self.response_unfollow = self.client.post(self.url_post_unfollow2)
@@ -275,21 +259,20 @@ class TestFavoriteView(TestCase):
         self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_post(self):
-        response = self.client.post(self.url_like, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url_like)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content)['likes_count'], 1)
         self.assertEqual(json.loads(response.content)['liked'], True)
 
     def test_failure_post_with_not_exist_tweet(self):
-        response = self.client.post(self.url_like_none, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url_like_none)
         self.assertEqual(response.status_code, 404)
         likes_count = self.post.like.all().count()
         self.assertEqual(likes_count, 0)
 
     def test_failure_post_with_favorited_tweet(self):
-        self.client.post(self.url_like, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        time.sleep(0.1)
-        response = self.client.post(self.url_like, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.post(self.url_like)
+        response = self.client.post(self.url_like)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content)['likes_count'], 1)
         self.assertEqual(json.loads(response.content)['liked'], True)
@@ -303,24 +286,23 @@ class TestUnFavoriteView(TestCase):
         self.url_unlike = reverse('tweet:unlike', kwargs={'pk': self.post.pk})
         self.url_unlike_none = reverse('tweet:unlike', args=[99])
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-        response = self.client.post(self.url_like, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url_like,)
         self.assertEqual(json.loads(response.content)['likes_count'], 1)
         self.assertEqual(json.loads(response.content)['liked'], True)
 
     def test_success_post(self):
-        response = self.client.post(self.url_unlike, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url_unlike,)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content)['likes_count'], 0)
         self.assertEqual(json.loads(response.content)['liked'], False)
 
     def test_failure_post_with_not_exist_tweet(self):
-        response = self.client.post(self.url_unlike_none, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(self.url_unlike_none,)
         self.assertEqual(response.status_code, 404)
         likes_count = self.post.like.all().count()
         self.assertEqual(likes_count, 1)
 
     def test_failure_post_with_unfavorited_tweet(self):
-        self.client.post(self.url_unlike, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        time.sleep(0.1)
-        response = self.client.post(self.url_like, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.post(self.url_unlike,)
+        response = self.client.post(self.url_like,)
         self.assertEqual(response.status_code, 200)

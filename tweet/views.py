@@ -33,7 +33,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class DetailPost(LoginRequiredMixin, DetailView):
+class DetailPostView(LoginRequiredMixin, DetailView):
     """投稿詳細ページ"""
     model = Post
     template_name = 'tweet/post_detail.html'
@@ -50,7 +50,7 @@ class OnlyYouMixin(UserPassesTestMixin):
         return post.user == self.request.user
 
 
-class UpdatePost(LoginRequiredMixin, OnlyYouMixin, UpdateView):
+class UpdatePostView(LoginRequiredMixin, OnlyYouMixin, UpdateView):
     model = Post
     template_name = 'tweet/post_update.html'
     fields = ['text']
@@ -62,7 +62,7 @@ class UpdatePost(LoginRequiredMixin, OnlyYouMixin, UpdateView):
         return reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
 
-class DeletePost(LoginRequiredMixin, OnlyYouMixin, DeleteView):
+class DeletePostView(LoginRequiredMixin, OnlyYouMixin, DeleteView):
     model = Post
     template_name = 'tweet/post_delete.html'
 
@@ -72,12 +72,11 @@ class DeletePost(LoginRequiredMixin, OnlyYouMixin, DeleteView):
         pk_user = post.user.pk
         return reverse_lazy('user:profile', kwargs={"pk": pk_user})
 
-
 ###############################################################
 # like
 
 
-class Like(LoginRequiredMixin, View):
+class LikeView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
@@ -96,7 +95,7 @@ class Like(LoginRequiredMixin, View):
         return JsonResponse(context)
 
 
-class UnLike(LoginRequiredMixin, View):
+class UnLikeView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
@@ -117,7 +116,7 @@ class UnLike(LoginRequiredMixin, View):
 # follow
 
 
-class UserFollow(LoginRequiredMixin, View):
+class UserFollowView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
 
@@ -126,20 +125,16 @@ class UserFollow(LoginRequiredMixin, View):
         user = get_object_or_404(User, pk=pk)
         followees = login_user.followees.all()
 
-        if ((user != login_user) and (user != 404)):
-            if user in followees:
-                pass
-            else:
+        if (user != login_user) and (user != 404):
+            if user not in followees:
                 login_user.followees.add(user)
-        elif (user == 404):
-            messages.warning(request, 'This user do not exist')
         else:
             messages.warning(request, 'you can not follow yourself')
             raise PermissionDenied()
         return redirect('user:profile', pk)
 
 
-class UserUnFollow(LoginRequiredMixin, View):
+class UserUnFollowView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
 
@@ -148,18 +143,16 @@ class UserUnFollow(LoginRequiredMixin, View):
         user = get_object_or_404(User, pk=pk)
         followees = login_user.followees.all()
 
-        if (user != login_user):
+        if user != login_user:
             if user in followees:
                 login_user.followees.remove(user)
-            else:
-                pass
         else:
             messages.warning(request, 'you can not unfollow yourself')
             raise PermissionDenied()
         return redirect('user:profile', pk)
 
 
-class UserFollowingList(LoginRequiredMixin, DetailView):
+class UserFollowingListView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'tweet/following_list.html'
 
@@ -171,7 +164,7 @@ class UserFollowingList(LoginRequiredMixin, DetailView):
         return context
 
 
-class UserFollowersList(LoginRequiredMixin, DetailView):
+class UserFollowersListView(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'tweet/followers_list.html'
 
