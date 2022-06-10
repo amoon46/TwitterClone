@@ -81,9 +81,7 @@ class LikeView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         pk = self.kwargs['pk']
         post = get_object_or_404(Post, pk=pk)
-        if self.request.user in post.like.all():
-            pass
-        else:
+        if self.request.user not in post.like.all():
             post.like.add(self.request.user)
         likes_count = post.like.count()
         liked = True
