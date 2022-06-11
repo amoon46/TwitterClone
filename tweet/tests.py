@@ -39,10 +39,8 @@ class UserProfiileView(TestCase):
         self.post3 = Post.objects.create(text='user1がテストしています', user=self.user1)
         self.url_profile1 = reverse('user:profile', kwargs={'pk': self.user1.pk})
         # フォロー数
-        self.user1.followees.add(self.user2)
-        self.user1.followees.add(self.user3)
-        self.user2.followees.add(self.user1)
-        self.user2.followees.add(self.user3)
+        self.user1.followees.add(self.user2, self.user3)
+        self.user2.followees.add(self.user1, self.user3)
         self.url_following = reverse('tweet:following_list', kwargs={'pk': self.user1.pk})
         self.url_followers = reverse('tweet:followers_list', kwargs={'pk': self.user1.pk})
 
@@ -286,9 +284,7 @@ class TestUnFavoriteView(TestCase):
         self.url_unlike = reverse('tweet:unlike', kwargs={'pk': self.post.pk})
         self.url_unlike_none = reverse('tweet:unlike', args=[99])
         self.client.login(email='test@gmail.com', password='Hogehoge777')
-        response = self.client.post(self.url_like,)
-        self.assertEqual(json.loads(response.content)['likes_count'], 1)
-        self.assertEqual(json.loads(response.content)['liked'], True)
+        self.client.post(self.url_like)
 
     def test_success_post(self):
         response = self.client.post(self.url_unlike,)
@@ -303,6 +299,6 @@ class TestUnFavoriteView(TestCase):
         self.assertEqual(likes_count, 1)
 
     def test_failure_post_with_unfavorited_tweet(self):
-        self.client.post(self.url_unlike,)
-        response = self.client.post(self.url_like,)
+        self.client.post(self.url_unlike)
+        response = self.client.post(self.url_like)
         self.assertEqual(response.status_code, 200)
