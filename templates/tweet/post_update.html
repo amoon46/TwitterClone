@@ -1,0 +1,24 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+post_update
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+	<div class="ui content">
+		<form class="ui form" action="" method="POST">
+			{% csrf_token %}
+			<div class="field tweet">
+				<h3 style="padding-top: 1em">tweet edit</h3>
+				{{ form.text }}
+			</div>
+			<div class="ui error message">{{ form.non_field_errors }}</div>
+			<div class="ui error message">{{ form.text.errors }}</div>
+			<button class="ui blue button" type="submit">complete</button>
+			<a href="{% url 'user:profile' user.pk %}" class="ui right floated button">cancel</a>
+		</form>
+	</div>
+</div>
+{% endblock %}

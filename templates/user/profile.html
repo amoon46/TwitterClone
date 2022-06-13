@@ -1,4 +1,9 @@
-{% extends 'twitter/base.html' %}
+{% extends   'twitter/base.html' %}
+{% load static %}
+
+{% block customcss %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock customcss %}
 
 {% block title %}
 profile
@@ -7,18 +12,93 @@ profile
 {% block contents %}
 <div class="ui text container">
     <div class="content">
-      <br><div class="header"><h2>Profile</h2></div><br>
+      <div class="header" style="padding-top: 1em"><h2>Profile</h2></div>
+      <div class="text-right">
+        {% if user == request.user %}
+          <a class="ui right floated text-white button" href="{% url 'user:profile_update' user.pk %}">profile edit</a>
+
+        {% else %}
+          {% if user in request.user.followees.all %}
+            <form class="ui form" action="{% url 'tweet:unfollow' pk=user.pk %}" method="POST">
+              {% csrf_token %}
+              <button class="ui right floated red button" type="submit">unfollow</button>
+            </form>
+          {% else %}
+            <form class="ui form" action="{% url 'tweet:follow' pk=user.pk %}" method="POST">
+              {% csrf_token %}
+              <button class="ui right floated blue button" type="submit">follow</button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+
         <table class="ui celled padded table">
           <tr>
-            <td>ニックネーム</td>
-            <td>{% if user.nickname %}{{ user.nickname }}{% else %}未設定{% endif %}</td>
+            <td>nickname</td>
+            <td>{% if user.nickname %}{{ user.nickname }}{% else %}I don't have a name yet. ({{user.pk}}){% endif %}
+            </td>
           </tr>
-          <tr>
             <td>introduction</td>
-            <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}未設定{% endif %}</td>
+            <td>{% if user.introduction %}{{ user.introduction | linebreaksbr }}{% else %}Not set{% endif %}</td>
           </tr>
         </table>
-    </div><br>
-  <a class="ui button" href="{% url 'user:profile_update' user.pk %}">edit</a>
+
+        <table class="ui celled padded table">
+          <thead>
+            <tr>
+            <th class="ui center aligned header">Like</th>
+            <th class="ui center aligned header">following</th>
+            <th class="ui center aligned header">follower</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="ui center aligned header">
+                <a>{{ user.related_post.count }}</a>
+              </td>
+              <td class="ui center aligned header">
+                <a href="{% url 'tweet:following_list' user.pk %}">{{ user.followees.count }}</a>
+              </td>
+              <td class="ui center aligned header">
+                <a href="{% url 'tweet:followers_list' user.pk %}">{{ followers.count}}</a>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+          </tr></tfoot>
+        </table>
+
+        {% for item in post %}
+        {% if user == item.user %}
+        <div class="alert alert-primary" role="alert">
+            <p>author：<a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">{% if item.user.nickname %}{{ item.user.nickname }}{% else %} I am a CAT ({{item.user.pk}}){% endif %}</td></a></p>
+            <p><a href="{% url 'tweet:post_detail' item.pk  %}" class="alert-link">{{ item.text | linebreaksbr }}</p>
+
+            {% if request.user in item.like.all %}
+            <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
+              <i class="fas fa-heart" style="color:red"></i>
+              <span>{{ item.like.count }}</span>
+            </button>
+          {% else %}
+            <button class="like" data-url="{% url 'tweet:like' item.pk %}">
+              <i class="far fa-heart" style="color:red"></i>
+              <span>{{ item.like.count }}</span>
+            </button>
+          {% endif %}
+
+            {%if item.user == request.user %}
+              <a href="{% url 'tweet:post_update' item.pk %}" class="btn btn-outline-secondary ms-3">edit</a>
+              <a href="{% url 'tweet:post_delete' item.pk %}" class="btn btn-dark ms-3">delete</a>
+            {% endif %}
+        </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+              {{ message }}
+          </li>
+      {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

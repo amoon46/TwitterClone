@@ -1,0 +1,36 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block customcss %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock customcss %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+  <div class="header" style="padding-top: 1em"></div>
+  {% for item in object_list %}
+    <div class="alert alert-primary" role="alert">
+        <p>author : <a href="{% url 'user:profile' item.user.pk  %}" class="alert-link">
+          {% if item.user.nickname %}{{ item.user.nickname }}
+          {% else %} I am a CAT ({{ item.user.pk }}){% endif %}</td></a></p>
+        <p><a href="{% url 'tweet:post_detail' item.pk  %}" class="alert-link">{{ item.text | linebreaksbr }}</a></p>
+
+        {% if request.user in item.like.all %}
+          <button class="like" data-url="{% url 'tweet:unlike' item.pk %}">
+            <i class="fas fa-heart" style="color:red"></i>
+            <span>{{ item.like.count }}</span>
+          </button>
+        {% else %}
+          <button class="like" data-url="{% url 'tweet:like' item.pk %}">
+            <i class="far fa-heart" style="color:red"></i>
+            <span>{{ item.like.count }}</span>
+          </button>
+        {% endif %}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import login
 
 from .models import User
+from tweet.models import Post
 from .forms import SignUpForm, LoginForm
 
 
@@ -15,7 +16,7 @@ class SignUpView(CreateView):
     form_class = SignUpForm
 
     # プロジェクトのURLConf(url.py)が読み込まれる前に、URLを返す
-    success_url = reverse_lazy('twitter:home')
+    success_url = reverse_lazy('tweet:top')
     template_name = 'user/signup.html'
 
     def form_valid(self, form):  # 追記
@@ -37,6 +38,13 @@ class LogoutConfirmView(LoginRequiredMixin, TemplateView):
 class ProfileDisplay(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'user/profile.html'
+
+    def get_context_data(self, *args, **kwargs):
+        user = self.object
+        context = super().get_context_data(*args, **kwargs)
+        context['post'] = Post.objects.filter(user=user).select_related('user')
+        context['followers'] = User.objects.filter(followees=user)
+        return context
 
 
 class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

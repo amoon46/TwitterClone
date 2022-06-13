@@ -1,0 +1,20 @@
+{% extends 'twitter/base.html' %}
+{% load static %}
+
+{% block title %}
+tweet_delete
+{% endblock title %}
+
+{% block contents %}
+<div class="ui text container">
+    <div class="ui content">
+        <div class="ui center aligned grid" style="padding: 3em"><h1>Do you really want to delete this?</h1></div>
+        <img class="ui fluid image"  src="{% static 'images/rose1.jpg' %}">
+            <form class="ui form" method="post">
+                {% csrf_token %}
+                <button class="ui blue button" type="submit">delete</button>
+                <a href="{% url 'user:profile' user.pk %}" class="ui right floated button">Don't</a>
+            </form>
+    </div>
+</div>
+{% endblock contents %}

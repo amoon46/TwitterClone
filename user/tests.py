@@ -1,13 +1,15 @@
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import SESSION_KEY
+
 
 from .models import User
 
 
 class TestSignUpView(TestCase):
     def setUp(self):
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.url_signup = reverse('user:signup')
 
     def test_success_get(self):
@@ -29,10 +31,8 @@ class TestSignUpView(TestCase):
             status_code=302,
             target_status_code=200
         )
-
         user_count = User.objects.count()
         self.assertEqual(user_count, 1)
-
         user_object = User.objects.get(pk=1)
         self.assertEqual(user_object.email, self.data['email'])
         self.assertIn(SESSION_KEY, self.client.session)
@@ -44,11 +44,8 @@ class TestSignUpView(TestCase):
             'password2': '',
         }
         self.response_blank = self.client.post(self.url_signup, self.data_blank)
-
         self.assertEquals(self.response_blank.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_blank.context.get('form')
         self.assertTrue(form.errors['email'])
         self.assertTrue(form.errors['password1'])
@@ -62,11 +59,8 @@ class TestSignUpView(TestCase):
             'password2': 'Hogehoge777',
         }
         self.response_email_empty = self.client.post(self.url_signup, self.data_email_empty)
-
         self.assertEquals(self.response_email_empty.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_email_empty.context.get('form')
         self.assertTrue(form.errors['email'])
 
@@ -78,11 +72,8 @@ class TestSignUpView(TestCase):
             'password2': '',
         }
         self.response_password_empty = self.client.post(self.url_signup, self.data_password_empty)
-
         self.assertEquals(self.response_password_empty.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_password_empty.context.get('form')
         self.assertTrue(form.errors['password1'])
         self.assertTrue(form.errors['password2'])
@@ -94,13 +85,9 @@ class TestSignUpView(TestCase):
             'password1': 'Hogehoge777',
             'password2': 'Hogehoge777',
         }
-
         self.response_invalid_email = self.client.post(self.url_signup, self.data_invalid_email)
-
         self.assertEquals(self.response_invalid_email.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_invalid_email.context.get('form')
         self.assertTrue(form.errors['email'])
 
@@ -114,9 +101,7 @@ class TestSignUpView(TestCase):
             self.url_signup, self.data_too_short_password
         )
         self.assertEquals(self.response_too_short_password.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_too_short_password.context.get('form')
         self.assertTrue(form.errors['password2'])
 
@@ -127,11 +112,8 @@ class TestSignUpView(TestCase):
             'password2': 'hogehoge777'
         }
         self.response_similar_to = self.client.post(self.url_signup, self.data_similar_to)
-
         self.assertEquals(self.response_similar_to.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_similar_to.context.get('form')
         self.assertTrue(form.errors['password2'])
 
@@ -145,9 +127,7 @@ class TestSignUpView(TestCase):
             self.url_signup, self.data_only_numbers_password
         )
         self.assertEquals(self.response_only_numbers_password.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_only_numbers_password.context.get('form')
         self.assertTrue(form.errors['password2'])
 
@@ -157,34 +137,31 @@ class TestSignUpView(TestCase):
             'password1': 'hogehoge777',
             'password2': 'gehogeho777',
         }
-
         self.response_not_equal_password = self.client.post(
             self.url_signup, self.data_not_equal_password
         )
         self.assertEquals(self.response_not_equal_password.status_code, 200)
-
         self.assertFalse(User.objects.exists())
-
         form = self.response_not_equal_password.context.get('form')
         self.assertTrue(form.errors['password2'])
 
 
 class TestHomeView(TestCase):
     def setUp(self):
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
         self.login_user = self.client.login(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
         self.response = self.client.get(self.url_home)
         self.assertEquals(self.response.status_code, 200)
-        self.assertTemplateUsed(self.response, 'twitter/home.html')
+        self.assertTemplateUsed(self.response, 'tweet/top.html')
 
 
 class TestLoginView(TestCase):
     def setUp(self):
         self.url_login = reverse('user:login')
-        self.url_home = reverse('twitter:home')
+        self.url_home = reverse('tweet:top')
         self.user = User.objects.create_user(email='test@gmail.com', password='Hogehoge777')
 
     def test_success_get(self):
@@ -198,7 +175,6 @@ class TestLoginView(TestCase):
             'password': 'Hogehoge777',
         }
         self.response_post = self.client.post(self.url_login, self.data)
-
         self.assertRedirects(
             self.response_post,
             self.url_home,
@@ -213,12 +189,9 @@ class TestLoginView(TestCase):
             'password': 'Hogehoge777',
         }
         self.response_with_not_exists_user = self.client.post(self.url_login, self.data)
-
         self.assertEquals(self.response_with_not_exists_user.status_code, 200)
-
         form = self.response_with_not_exists_user.context.get('form')
         self.assertTrue(form.non_field_errors)
-
         self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
@@ -227,12 +200,9 @@ class TestLoginView(TestCase):
             'password': '',
         }
         self.response_with_empty_password = self.client.post(self.url_login, self.data)
-
         self.assertEquals(self.response_with_empty_password.status_code, 200)
-
         form = self.response_with_empty_password.context.get('form')
         self.assertTrue(form.non_field_errors)
-
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
@@ -250,7 +220,6 @@ class TestLogoutView(TestCase):
     def test_logout_success_get(self):
         self.response_logout = self.client.get(self.url_logout)
         self.assertEqual(self.response_logout.status_code, 302)
-
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 
@@ -293,7 +262,6 @@ class TestUserProfileEditView(TestCase):
             'introduction': 'jimcarrey',
         }
         self.response_post = self.client.post(self.url_update_1, self.data)
-
         self.assertRedirects(
             self.response_post,
             self.url_profile_1,
@@ -305,10 +273,6 @@ class TestUserProfileEditView(TestCase):
         self.assertEqual(user_object.introduction, self.data['introduction'])
 
     def test_failure_post_with_not_exists_user(self):
-        self.data = {
-            'nickname': 'yesman',
-            'introduction': 'jimcarrey',
-        }
         response = self.client.get(self.url_update_none)
         self.assertEqual(response.status_code, 404)
 
@@ -318,7 +282,6 @@ class TestUserProfileEditView(TestCase):
             'introduction': 'jimcarrey',
         }
         self.response_post_incorrect_user = self.client.post(self.url_update_2, self.data)
-
         self.assertEqual(self.response_post_incorrect_user.status_code, 403)
         user_object = User.objects.get(pk=2)
         self.assertFalse(user_object.nickname, self.data['nickname'])

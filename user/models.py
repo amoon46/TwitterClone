@@ -42,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
-    # followees = models.ManyToManyField('self', blank=True, symmetrical=False)
+    followees = models.ManyToManyField('self', blank=True, symmetrical=False)
 
     email = models.EmailField(
         'email address',
